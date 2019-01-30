@@ -1,0 +1,124 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Add the data. 
+```{r getData, eval=FALSE}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+
+```{r tableLocale, eval=FALSE}
+table(eduwa$LocaleType,exclude = 'nothing')
+```
+
+```{r tableLocaleProp, eval=FALSE}
+absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
+prop.table(absoluteT)
+```
+
+```{r ToPlotLocale, eval=FALSE}
+ToPlot=prop.table(absoluteT)*100
+```
+
+```{r NamesLocale, eval=FALSE}
+names(ToPlot) 
+names(ToPlot)[5]='Unknown'
+```
+
+```{r}
+ToPlot
+```
+
+
+```{r TitleSource, eval=FALSE}
+titleText='Where are Public Schools located in WA in 2019?'
+sourceText='Source: US Department of Education'
+```
+
+```{r GGPlot Library}
+
+ToPlotOrd=sort(ToPlot)
+
+tableFreq=as.data.frame(ToPlotOrd)
+
+names(tableFreq)=c("locale","pct")
+#you have:
+tableFreq
+
+
+```
+
+```{r ReorderTable, eval=FALSE}
+library(ggplot2)
+
+base= ggplot(data = tableFreq, 
+             aes(x = locale,
+                 y = pct)) 
+```
+
+
+```{r}
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') # y is just what it is!
+plot1
+```
+
+```{r}
+plot2 = plot1 + labs(title=titleText2,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+plot2
+```
+
+```{r}
+plot3 = plot2 + geom_hline(yintercept = 25, #where
+                           linetype="dashed", 
+                           size=1.5, #thickness
+                           alpha=0.5) #transparency
+plot3
+```
+
+```{r}
+library(scales)
+
+# customize Y axis
+plot4 = plot3 + scale_y_continuous(breaks=c(0,10, 25,40,50),
+                                 limits = c(0, 50), # expand = c(0, 0),
+                                 labels=scales::unit_format(suffix = '%')) 
+plot4
+```
+
+```{r}
+plot5 = plot4 + theme(panel.background = element_rect(fill = "white",
+                                                    colour = "grey50"),
+                    plot.caption = element_text(hjust = 0), # default was 1
+                    plot.title = element_text(hjust = 0.5))
+plot5
+```
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+plot6 = plot5 + geom_text(aes(y = pct ,
+                            label = paste0(round(pct,2), '%')),
+                        vjust=1, # if flipping 'hjust'
+                        size = 3)
+# wanna flip the plot?
+plot6 + coord_flip()
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
