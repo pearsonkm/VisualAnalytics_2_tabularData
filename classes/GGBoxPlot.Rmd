@@ -1,0 +1,94 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+Add the Data. 
+```{r getData, eval=FALSE}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+
+```{r}
+table(eduwa$High.Grade,exclude = 'nothing')
+```
+
+```{r}
+titleText='Distribution of Highest Grades Offered at WA Public Schools'
+sourceText='Source: US Department of Education'
+```
+
+
+```{r CallGGPlot, eval=FALSE}
+library(ggplot2)
+box1 = ggplot(eduwa, aes(y=as.numeric(High.Grade))) +   theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+box1 = box1 + geom_boxplot() + coord_flip() # to show it horizontally
+
+box1
+
+```
+
+```{r Labels, eval=FALSE}
+# Create labels that use the original ordinal levels
+ordLabels= levels(eduwa$High.Grade)
+# Add the labels (based on the ordLabels) to the plot 
+# Breaks are from 1 to 15 because there are 15 grades
+box2 = box1 + scale_y_continuous(labels=ordLabels,breaks=1:15)
+box2
+
+```
+
+```{r box_quarts, eval=FALSE}
+#get positions of the quartiles
+# using 'ggplot_build'
+pos_q1=     ggplot_build(box2)$data[[1]]$lower
+pos_median= ggplot_build(box2)$data[[1]]$middle
+pos_q3=     ggplot_build(box2)$data[[1]]$upper
+
+# using
+levels(eduwa$High.Grade)[c(pos_q1,pos_median,pos_q3)]
+```
+
+```{r advancedTable, warning=FALSE,results='asis', eval=FALSE}
+library(summarytools)
+freq(eduwa$High.Grade,style = 'rmarkdown')
+```
+
+```{r boxplot_title, eval=FALSE}
+box3 = box2 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+box3
+```
+
+```{r boxplot_ylabel, eval=FALSE}
+box4 = box3 + ylab("Grades Offered") 
+
+box4
+```
+
+```{r boxplot_theme, eval=FALSE}
+box5 = box4 + theme(plot.title = element_text(family="Times", color="black", size=14, face="bold", hjust = 0.5),
+                    plot.caption = element_text(family="Times", color="black", size=10, face="plain", vjust = 0),
+                    axis.title.x = element_text(family="Times", color="black", size=10, face="italic", vjust = 0.5, hjust = 0.5))
+
+box5
+```
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
