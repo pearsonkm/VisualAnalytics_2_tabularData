@@ -1,0 +1,136 @@
+---
+title: "Exercise 2: Complete Lolliplot"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r getData, eval=FALSE}
+
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+
+```
+
+
+```{r eduwaInfo, eval=FALSE}
+dim(eduwa)
+
+names(eduwa)
+
+table(eduwa$LocaleType,exclude = 'nothing')
+```
+
+```{r tableFreq, eval=FALSE}
+tableFreq
+```
+
+```{r titles, eval=FALSE}
+titleText='Where are Public Schools located in WA in 2019?'
+sourceText='Source: US Department of Education'
+
+```
+
+```{r lolligg, eval=FALSE}
+base = ggplot(tableFreq, aes(x=locale,pct)) 
+lolliplot1=base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = pct, 
+                                   xend = locale), color = "grey50") 
+lolliplot1 + geom_point()
+```
+
+```{r lolliOrd, eval=FALSE}
+tableFreq[order(tableFreq$pct),]
+```
+
+```{r lolliOrdgg, eval=FALSE}
+
+# reordering DF steps:
+tableFreqO=tableFreq[order(tableFreq$pct),]
+
+
+base = ggplot(tableFreqO, aes(locale,pct)) 
+lolliplot1=base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = pct, 
+                                   xend = locale), color = "gray") 
+lolliplot2 = lolliplot1 + geom_point()
+lolliplot2 + scale_x_discrete(limits=tableFreqO$locale) # key element
+
+```
+
+```{r lolli_axis_gg, eval=FALSE}
+# new variable
+tableFreqO$gap=tableFreqO$pct-25
+
+# plot the new variable
+base = ggplot(tableFreqO, aes(locale,gap)) 
+
+lolliplot1=base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = gap, 
+                                   xend = locale), color = "gray") 
+lolliplot2 = lolliplot1 + geom_point()
+lolliplot2 + scale_x_discrete(limits=tableFreqO$locale) # key element
+```
+
+```{r lolli_gg_color, eval=FALSE}
+# a new column for color
+tableFreqO$PositiveGap=ifelse(tableFreqO$gap>0,T,F)
+
+# add new aesthetics 'color'
+base = ggplot(tableFreqO, aes(locale,gap,
+                              color=PositiveGap)) #change
+lolliplot1=base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = gap, 
+                                   xend = locale), color = "gray") 
+lolliplot2 = lolliplot1 + geom_point()
+lolliplot2 + scale_x_discrete(limits=tableFreqO$locale) # key element
+```
+
+
+```{r lolli_gg_anot, eval=FALSE}
+# a new column for color
+tableFreqO$PositiveGap=ifelse(tableFreqO$gap>0,T,F)
+
+base = ggplot(tableFreqO, aes(locale,gap,color=PositiveGap,
+                              label = round(gap,3))) #  change
+lolliplot1=base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = gap, 
+                                   xend = locale), color = "gray") 
+lolliplot2=lolliplot1 + geom_point() 
+lolliplot3= lolliplot2 + scale_x_discrete(limits=tableFreqO$locale) 
+# annotating and moving the text on the horizontal
+lolliplot3 + geom_text(nudge_x=0.3) 
+```
+
+```{r nudge_gg, eval=FALSE}
+lolliplot4 = lolliplot3 + geom_text(nudge_x=0.3,show.legend = FALSE) 
+lolliplot4
+```
+
+```{r lolli_gg_titles, eval=FALSE}
+lolliplot5 = lolliplot4 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+
+lolliplot5
+```
+
+```{r lolli_gg_theme, eval=FALSE}
+lolliplot6 = lolliplot5 + theme(
+                    plot.caption = element_text(hjust = 1), # default was 1
+                    plot.title = element_text(hjust = 0.5))
+
+lolliplot6
+```
+
+
