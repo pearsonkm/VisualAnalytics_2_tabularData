@@ -1,0 +1,97 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+Load the data 
+```{r}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+
+Create the dataframe 
+```{r}
+eduwa1=eduwa[complete.cases(eduwa$Free.Lunch),]
+dataHist=hist(eduwa1$Free.Lunch)
+```
+
+```{r}
+hist(eduwa1$Free.Lunch,labels = T,xlab="Free Lunch")
+```
+
+```{r}
+library(ggplot2)
+
+base= ggplot(eduwa1,aes(x = Free.Lunch))  
+h1= base + geom_histogram()
+h1 
+```
+
+```{r}
+dataHist
+```
+
+To see what was used to build the GGPlot Histogram of Free.Lunch
+```{r}
+ggplot_build(h1)$data[[1]]
+```
+
+```{r GGplotFree.Lunch, eval=FALSE}
+#ggplot
+base= ggplot(eduwa1,aes(x = Free.Lunch))  
+h1= base + geom_histogram(breaks=seq(0, 1780, 20), 
+                          boundary=0, 
+                          col="red", 
+                          fill="blue", 
+                          alpha=.3, 
+                          na.rm = TRUE, 
+                          inherit.aes = TRUE)
+
+h1= h1 + stat_bin(binwidth = 20, aes(label=..count..), cex=1.8, 
+                  geom = "text", boundary = 0,vjust=-0.5)
+
+h1= h1 + labs(title="WA Schools Providing Free Lunch", subtitle =sourceText, x="Quantity of Free Lunches", y="Number of Schools") + 
+  xlim(c(0,1000))+
+  ylim(c(0,360))
+
+h1
+
+```
+
+```{r}
+h2 = h1 + scale_x_continuous("Quantity of Free Lunches", breaks=seq(0, 1000, 100), limits = c(0,1000))
+
+h2
+```
+
+
+```{r}
+#base
+hist(eduwa1$Free.Lunch, labels = T,xlab="Free Lunch")
+```
+
+```{r}
+hist(eduwa1$Free.Lunch,labels = T, xlab = "Free Lunch", xaxt="n")
+axis(side=1, at=dataHist$breaks)
+```
+
+```{r}
+freq(eduwa1$Free.Lunch, style = "rmarkdown", report.nas = F)
+```
+
+```
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
